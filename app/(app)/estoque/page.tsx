@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { BotaoApagar } from "@/components/botao-apagar";
 import { FormContagem, FormNovoCorte } from "@/components/forms-admin";
-import { exigirAdmin } from "@/lib/auth";
+import { getPerfil } from "@/lib/auth";
 import {
   cabecalhoTabela,
   cartaoTabela,
@@ -18,24 +18,29 @@ export const metadata: Metadata = {
 const TIPOS = { entrada: "Entrada", saida: "Retirada", ajuste: "Contagem" };
 
 export default async function PaginaEstoque() {
-  await exigirAdmin();
+  const perfil = await getPerfil();
+  const admin = perfil?.papel === "admin";
   const supabase = await createClient();
 
-  const [estoque, movimentos, perfis, cortes] = await Promise.all([
-    supabase.rpc("estoque_atual"),
-    supabase
-      .from("movimentacoes")
-      .select(
-        "id, tipo, corte_id, quantidade_kg, fornecedor, destino, criado_por, criado_em",
-      )
-      .order("criado_em", { ascending: false })
-      .limit(30),
-    supabase.from("perfis").select("id, nome"),
-    supabase.from("cortes").select("id, nome").order("nome"),
-  ]);
+  const estoque = await supabase.rpc("estoque_atual");
 
-  const nomeCorte = new Map((cortes.data ?? []).map((c) => [c.id, c.nome]));
-  const nomeUsuario = new Map((perfis.data ?? []).map((p) => [p.id, p.nome]));
+  // Contagem, cortes e histórico são só do administrador.
+  const [movimentos, perfis, cortes] = admin
+    ? await Promise.all([
+        supabase
+          .from("movimentacoes")
+          .select(
+            "id, tipo, corte_id, quantidade_kg, fornecedor, destino, criado_por, nome_responsavel, criado_em",
+          )
+          .order("criado_em", { ascending: false })
+          .limit(30),
+        supabase.from("perfis").select("id, nome"),
+        supabase.from("cortes").select("id, nome").order("nome"),
+      ])
+    : [null, null, null];
+
+  const nomeCorte = new Map((cortes?.data ?? []).map((c) => [c.id, c.nome]));
+  const nomeUsuario = new Map((perfis?.data ?? []).map((p) => [p.id, p.nome]));
 
   return (
     <div className="flex flex-col gap-6">
@@ -75,13 +80,15 @@ export default async function PaginaEstoque() {
         </div>
       </section>
 
+      {admin ? (
+        <>
       <section>
         <h2 className="mb-1 text-base font-bold">Contagem física</h2>
         <p className="mb-2 text-[13.5px] text-suave">
           Use para informar o estoque inicial ou conferir o freezer. O sistema
           registra a diferença entre o que ele calculava e o que você contou.
         </p>
-        <FormContagem cortes={cortes.data ?? []} />
+        <FormContagem cortes={cortes?.data ?? []} />
       </section>
 
       <section>
@@ -106,7 +113,7 @@ export default async function PaginaEstoque() {
               </tr>
             </thead>
             <tbody>
-              {(movimentos.data ?? []).map((mov) => {
+              {(movimentos?.data ?? []).map((mov) => {
                 const detalhe = mov.fornecedor ?? mov.destino;
                 const sinal =
                   mov.tipo === "saida"
@@ -131,7 +138,9 @@ export default async function PaginaEstoque() {
                       {formatarKg(Math.abs(mov.quantidade_kg))}
                     </td>
                     <td className={celulaTabela}>
-                      {nomeUsuario.get(mov.criado_por) ?? "-"}
+                      {mov.nome_responsavel ??
+                        (mov.criado_por ? nomeUsuario.get(mov.criado_por) : null) ??
+                        "-"}
                     </td>
                     <td className={celulaTabela}>
                       <BotaoApagar id={mov.id} />
@@ -139,7 +148,7 @@ export default async function PaginaEstoque() {
                   </tr>
                 );
               })}
-              {(movimentos.data ?? []).length === 0 ? (
+              {(movimentos?.data ?? []).length === 0 ? (
                 <tr>
                   <td className="px-3 py-3 text-suave" colSpan={6}>
                     Nenhum registro ainda.
@@ -150,6 +159,8 @@ export default async function PaginaEstoque() {
           </table>
         </div>
       </section>
+        </>
+      ) : null}
     </div>
   );
 }

@@ -1,6 +1,6 @@
 "use client";
 
-import { useActionState } from "react";
+import { useActionState, useEffect, useState } from "react";
 import {
   registrarEntrada,
   registrarSaida,
@@ -17,10 +17,34 @@ const DESTINOS = ["Almoço", "Jantar", "Marmitas", "Outro"];
 export function FormMovimento({
   modo,
   cortes,
+  nomeInicial,
 }: {
   modo: "entrada" | "saida";
   cortes: CorteLinha[];
+  /** Nome do usuário logado; sem login, a pessoa digita e o navegador lembra. */
+  nomeInicial?: string;
 }) {
+  const [nome, setNome] = useState(nomeInicial ?? "");
+
+  useEffect(() => {
+    if (nomeInicial) return;
+    try {
+      const guardado = localStorage.getItem("gestoreg:nome");
+      if (guardado) setNome(guardado);
+    } catch {
+      // Sem armazenamento disponível: a pessoa digita o nome a cada vez.
+    }
+  }, [nomeInicial]);
+
+  function mudarNome(valor: string) {
+    setNome(valor);
+    try {
+      localStorage.setItem("gestoreg:nome", valor);
+    } catch {
+      // Ignorado de propósito.
+    }
+  }
+
   const [estado, acao] = useActionState<EstadoForm, FormData>(
     modo === "entrada" ? registrarEntrada : registrarSaida,
     { n: 0 },
@@ -32,6 +56,22 @@ export function FormMovimento({
 
       {/* A chave muda a cada registro bem-sucedido e limpa os campos. */}
       <form key={estado.n} action={acao} className="flex flex-col gap-3">
+        <label className={rotuloCampo}>
+          Seu nome
+          <input
+            name="nome"
+            type="text"
+            required
+            minLength={2}
+            maxLength={60}
+            autoComplete="name"
+            placeholder="Quem está registrando"
+            value={nome}
+            onChange={(e) => mudarNome(e.target.value)}
+            className={campo}
+          />
+        </label>
+
         {modo === "entrada" ? (
           <label className={rotuloCampo}>
             Fornecedor
