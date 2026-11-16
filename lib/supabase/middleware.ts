@@ -7,6 +7,8 @@ import type { Database } from "@/types/database";
 const ROTAS_PUBLICAS = ["/login", "/receber", "/retirar", "/estoque"];
 
 function ehRotaPublica(caminho: string): boolean {
+  // A página inicial só redireciona para /retirar.
+  if (caminho === "/") return true;
   return ROTAS_PUBLICAS.some(
     (rota) => caminho === rota || caminho.startsWith(`${rota}/`),
   );
