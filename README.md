@@ -15,6 +15,19 @@ Gestão de estoque de carnes para estabelecimento: entrada, retirada, contagem f
 2. Copie `.env.example` para `.env.local` e preencha a URL e a chave pública do Supabase (Project Settings > API).
 3. Inicie: `npm run dev` e abra http://localhost:3000
 
+## Variáveis de ambiente
+
+| Variável | Onde | Para que serve |
+| --- | --- | --- |
+| `NEXT_PUBLIC_SUPABASE_URL` | local e Vercel | endereço do projeto Supabase |
+| `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` | local e Vercel | chave pública (protegida pelas regras RLS) |
+| `SUPABASE_SERVICE_ROLE_KEY` | só no servidor (Vercel) | criar usuários pela tela Usuários. Nunca use o prefixo `NEXT_PUBLIC_` nela |
+
+## Telas
+
+- **Receber** e **Retirar**: qualquer usuário logado registra entradas e retiradas (os QR codes apontam para elas).
+- **Estoque**, **QR codes** e **Usuários**: somente administradores. No Estoque ficam o saldo, a contagem física, os cortes e o histórico.
+
 ## Scripts
 
 | Comando | O que faz |
