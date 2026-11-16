@@ -1,0 +1,266 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Estoque de carnes</title>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;600;700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<style>
+:root{--bg:#f3f6f5;--sf:#fff;--ink:#17212b;--mut:#5a6671;--line:#d5ddda;--ac:#0f6b5c;--acs:#dcefea;--wa:#8f5100;--was:#fbeed6;--er:#b3261e;--ers:#fbe2e0;--sa:#8a3b12;--sas:#f8e4d8;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){color-scheme:dark;--bg:#0f1519;--sf:#182026;--ink:#e6ecef;--mut:#9aa7b0;--line:#2c3841;--ac:#4cc3ab;--acs:#16352f;--wa:#f0b255;--was:#3a2b10;--er:#ff8a80;--ers:#40191a;--sa:#f2a77c;--sas:#3a2417}}
+:root[data-theme="dark"]{color-scheme:dark;--bg:#0f1519;--sf:#182026;--ink:#e6ecef;--mut:#9aa7b0;--line:#2c3841;--ac:#4cc3ab;--acs:#16352f;--wa:#f0b255;--was:#3a2b10;--er:#ff8a80;--ers:#40191a;--sa:#f2a77c;--sas:#3a2417}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.45 "Instrument Sans",system-ui,-apple-system,"Segoe UI",sans-serif}
+*,*::before,*::after{box-sizing:inherit}
+.w{max-width:760px;margin:0 auto;padding:14px}
+h1{font-size:21px;margin:0 0 10px;letter-spacing:-.01em}
+h2{font-size:16px;margin:18px 0 8px}
+.tabs{display:flex;gap:4px;margin-bottom:12px;border-bottom:1px solid var(--line);overflow-x:auto}
+.tabs button{background:none;border:0;border-bottom:3px solid transparent;padding:10px 14px;font:inherit;font-weight:600;color:var(--mut);cursor:pointer;white-space:nowrap}
+.tabs button[aria-selected=true]{color:var(--ac);border-color:var(--ac)}
+input,select,button{font:inherit;color:var(--ink)}
+input,select{background:var(--sf);border:1px solid var(--line);border-radius:8px;padding:11px 10px;width:100%;min-width:0}
+input:focus-visible,select:focus-visible,button:focus-visible{outline:2px solid var(--ac);outline-offset:1px}
+label.f{display:flex;flex-direction:column;gap:3px;font-size:13px;color:var(--mut)}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin:8px 0 12px}
+.chip{background:var(--sf);border:1px solid var(--line);border-radius:999px;padding:10px 14px;cursor:pointer;font-weight:600}
+.chip small{color:var(--mut);font-weight:400;margin-left:4px}
+.chip.on{background:var(--acs);border-color:var(--ac);color:var(--ac)}
+.row{display:grid;grid-template-columns:1fr 110px auto;gap:8px;align-items:center;background:var(--sf);border:1px solid var(--line);border-radius:10px;padding:8px 10px;margin-bottom:8px}
+.row b{font-weight:600}
+.x{background:none;border:0;color:var(--er);font-size:22px;cursor:pointer;padding:4px 8px}
+.btn{background:var(--ac);color:var(--bg);border:0;border-radius:10px;padding:14px;font-weight:700;cursor:pointer;width:100%;font-size:17px}
+.btn.s{background:var(--sa);color:var(--bg)}
+.btn.g{background:none;color:var(--ink);border:1px solid var(--line);width:auto;padding:9px 14px;font-size:15px;font-weight:600}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px}
+.st{padding:10px 12px;border-radius:8px;margin:10px 0;background:var(--was);color:var(--wa);font-weight:600}
+.st.ok{background:var(--acs);color:var(--ac)}
+.tw{overflow-x:auto;background:var(--sf);border:1px solid var(--line);border-radius:10px}
+table{border-collapse:collapse;width:100%;min-width:420px}
+th,td{padding:9px 12px;text-align:right;border-bottom:1px solid var(--line)}
+th:first-child,td:first-child{text-align:left}
+th{font-size:13px;color:var(--mut);font-weight:600}
+tr:last-child td{border-bottom:0}
+td.neg{color:var(--er);font-weight:700}
+.note{font-size:13.5px;color:var(--mut)}
+.qrs{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px;margin-top:12px}
+.qr{background:#fff;color:#111;border:1px solid var(--line);border-radius:10px;padding:14px;text-align:center}
+.qr div.c{display:flex;justify-content:center;margin:8px 0}
+.qr b{font-size:20px}
+.lnk{background:none;border:0;color:var(--ac);font:inherit;font-size:14px;font-weight:600;padding:6px 0;margin-bottom:6px;cursor:pointer;text-decoration:underline}
+.bar{display:flex;flex-wrap:wrap;gap:10px;background:var(--sf);border:1px solid var(--line);border-radius:10px;padding:12px;margin-bottom:12px}.bar label.f{flex:1 1 130px}
+.tools{display:flex;flex-wrap:wrap;gap:8px;align-items:end;margin-bottom:12px}.tools label.f{flex:1 1 150px}
+.it{display:grid;grid-template-columns:2fr repeat(4,minmax(70px,1fr)) 1.3fr auto;gap:8px;align-items:end;background:var(--sf);border:1px solid var(--line);border-radius:10px;padding:10px;margin-bottom:8px}.it.nc{border-left:4px solid var(--wa)}.it .nm{display:flex;flex-direction:column;gap:6px}
+.out{font-size:13px;color:var(--mut)}.out b{display:block;color:var(--ink);font-size:15px}.out.bad b{color:var(--er)}.out.wait b{color:var(--wa)}
+.msg{padding:10px 12px;border-radius:8px;margin-bottom:12px;background:var(--was);color:var(--wa)}
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:10px;margin-bottom:14px}.card{background:var(--sf);border:1px solid var(--line);border-radius:10px;padding:12px}.card span{font-size:13px;color:var(--mut)}.card b{display:block;font-size:22px;letter-spacing:-.01em}
+.band{border-radius:10px;padding:12px;margin-bottom:14px;font-weight:600}.b-ok{background:var(--acs);color:var(--ac)}.b-wa{background:var(--was);color:var(--wa)}.b-er{background:var(--ers);color:var(--er)}
+.add{display:grid;grid-template-columns:2fr 1fr 1fr auto;gap:8px;align-items:end;margin-top:14px}
+.btn.rm{color:var(--er);padding:7px 10px;font-size:14px}
+@media (max-width:720px){.it{grid-template-columns:repeat(3,1fr)}.it .nm{grid-column:1/-1}.it .out,.it .rm{grid-column:span 3}.add{grid-template-columns:1fr 1fr}.add label.f:first-child{grid-column:1/-1}}
+[hidden]{display:none!important}
+@media print{body{background:#fff}.tabs,.noprint,h1{display:none}}
+</style>
+</head>
+<body>
+<div class="w">
+  <h1>Estoque de carnes</h1>
+  <div class="tabs" role="tablist">
+    <button role="tab" data-v="receber">Receber</button>
+    <button role="tab" data-v="retirar">Retirar</button>
+    <button role="tab" data-v="estoque" data-own>Estoque</button>
+    <button role="tab" data-v="qr" data-own>QR codes</button>
+  </div>
+  <div id="st"></div>
+
+  <section id="v-receber" hidden>
+    <div class="two">
+      <label class="f">Fornecedor<input id="o-E" type="text" placeholder="Nome do fornecedor"></label>
+      <label class="f">Quem está registrando?<input class="quem" type="text" placeholder="Seu nome"></label>
+    </div>
+    <div class="chips" id="ch-E"></div>
+    <div id="c-E"></div>
+    <button class="lnk" data-tog="w-E">+ Incluir outro corte</button>
+    <div id="w-E" class="two" hidden style="align-items:end">
+      <label class="f">Nome do corte<input id="n-E" type="text" placeholder="Ex.: Picanha"></label>
+      <button class="btn g" data-add="E">Adicionar</button>
+    </div>
+    <button class="btn" data-go="E" style="margin-top:8px">Registrar entrada</button>
+  </section>
+
+  <section id="v-retirar" hidden>
+    <label class="f">Quem está retirando?<input class="quem" type="text" placeholder="Seu nome"></label>
+    <div class="chips" id="ch-S"></div>
+    <div id="c-S"></div>
+    <div class="two"><label class="f">Para qual produção?<select id="o-S"><option>Almoço</option><option>Jantar</option><option>Marmitas</option><option>Outro</option></select></label>
+    <label class="f">Outro item<input id="n-S" type="text" placeholder="Digite e toque em +"></label></div>
+    <button class="btn g noprint" data-add="S" style="margin-bottom:12px">+ Adicionar outro item</button>
+    <button class="btn s" data-go="S">Registrar retirada</button>
+  </section>
+
+  <section id="v-estoque" hidden>
+    <div class="tw"><table><thead><tr><th>Item</th><th>Estoque atual</th><th>Entradas</th><th>Saídas</th></tr></thead><tbody id="tb"></tbody></table></div>
+    <h2>Contagem física</h2>
+    <p class="note">Use para informar o estoque inicial ou conferir o freezer. O sistema registra a diferença entre o que ele calculava e o que você contou.</p>
+    <div class="two"><label class="f">Item<select id="ci"></select></label><label class="f">Peso contado (kg)<input id="ck" type="number" min="0" step="any" inputmode="decimal"></label></div>
+    <button class="btn g" id="cb">Registrar contagem</button>
+    <h2>Últimos registros</h2>
+    <div class="tw"><table><thead><tr><th>Quando</th><th>Tipo</th><th>Item</th><th>kg</th><th>Quem</th><th></th></tr></thead><tbody id="rc"></tbody></table></div>
+  </section>
+
+  <section id="v-qr" hidden>
+    <label class="f noprint">Link deste app (confira se abre o app certo)<input id="base" type="text"></label>
+    <div class="qrs" id="qrs"></div>
+    <p class="note noprint">Quem ler o código precisa ter acesso ao app. Imprima e cole um QR no freezer (retirada) e outro no local de recebimento.</p>
+    <button class="btn g noprint" onclick="window.print()">Imprimir QR codes</button>
+  </section>
+</div>
+
+<script>
+var $ = function(id){ return document.getElementById(id); };
+var ITENS = ["Coxão mole","Maminha","Carne moída","Coxa e sobrecoxa de frango","Filé de peito de frango","Filé de tilápia","Lombo suíno","Linguiça","Costela bovina","Alcatra"];
+var db = null, user = null, movs = [], cart = {E: [], S: []}, canEdit = false;
+var N = function(v){ return v.toLocaleString("pt-BR",{maximumFractionDigits:2}); };
+var esc = function(s){ return String(s).replace(/[&<>"]/g,function(c){ return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]; }); };
+var TIPO = {E:"Entrada",S:"Retirada",A:"Contagem"};
+function status(m, ok){ $("st").innerHTML = m ? '<div class="st'+(ok?' ok':'')+'">'+m+'</div>' : ""; if (ok) setTimeout(function(){ status(""); }, 3500); }
+
+function stock(){
+  var s = {};
+  movs.forEach(function(m){
+    var o = s[m.item] || (s[m.item] = {e:0, s:0, a:0});
+    if (m.t === "E") o.e += m.kg; else if (m.t === "S") o.s += m.kg; else o.a += m.kg;
+  });
+  Object.keys(s).forEach(function(k){ s[k].at = s[k].e + s[k].a - s[k].s; });
+  return s;
+}
+function names(){
+  var l = ITENS.slice();
+  movs.forEach(function(m){ if (l.indexOf(m.item) < 0) l.push(m.item); });
+  return l;
+}
+function chips(){
+  var s = stock();
+  ["E","S"].forEach(function(t){
+    $("ch-"+t).innerHTML = names().map(function(n, i){
+      var on = cart[t].some(function(r){ return r.item === n; });
+      var at = s[n] ? '<small>'+N(s[n].at)+' kg</small>' : "";
+      return '<button class="chip'+(on?' on':'')+'" data-t="'+t+'" data-i="'+i+'">'+esc(n)+(t === "S" ? at : "")+'</button>';
+    }).join("");
+  });
+}
+function cartView(t){
+  $("c-"+t).innerHTML = cart[t].map(function(r, i){
+    return '<div class="row"><b>'+esc(r.item)+'</b><input type="number" min="0" step="any" inputmode="decimal" placeholder="kg" value="'+(r.kg || "")+'" data-t="'+t+'" data-r="'+i+'" aria-label="Peso em kg de '+esc(r.item)+'"><button class="x" data-t="'+t+'" data-rm="'+i+'" aria-label="Remover">×</button></div>';
+  }).join("");
+  chips();
+}
+function addItem(t, n){
+  n = n.trim(); if (!n) return;
+  if (!cart[t].some(function(r){ return r.item === n; })) cart[t].push({item: n, kg: 0});
+  cartView(t);
+  var ins = $("c-"+t).querySelectorAll("input"); if (ins.length) ins[ins.length-1].focus();
+}
+document.addEventListener("click", function(e){
+  var b = e.target.closest("button"); if (!b) return;
+  var t = b.dataset.t;
+  if (b.classList.contains("chip")) {
+    var n = names()[+b.dataset.i], k = cart[t].findIndex(function(r){ return r.item === n; });
+    if (k > -1) { cart[t].splice(k, 1); cartView(t); } else addItem(t, n);
+  } else if (b.dataset.rm != null) { cart[t].splice(+b.dataset.rm, 1); cartView(t); }
+  else if (b.dataset.tog) { var w = $(b.dataset.tog); w.hidden = !w.hidden; if (!w.hidden) w.querySelector("input").focus(); }
+  else if (b.dataset.add) { addItem(b.dataset.add, $("n-"+b.dataset.add).value); $("n-"+b.dataset.add).value = ""; }
+  else if (b.dataset.go) registrar(b.dataset.go);
+});
+document.addEventListener("input", function(e){
+  var el = e.target;
+  if (el.dataset.r != null) cart[el.dataset.t][+el.dataset.r].kg = parseFloat(el.value) || 0;
+  if (el.classList.contains("quem")) { document.querySelectorAll(".quem").forEach(function(q){ if (q !== el) q.value = el.value; }); try { localStorage.setItem("quem", el.value); } catch(x) {} }
+});
+
+async function registrar(t){
+  if (!db) { status("Sem conexão com o registro compartilhado. Abra o link logado na sua conta."); return; }
+  var rows = cart[t].filter(function(r){ return r.kg > 0; });
+  if (!rows.length) { status("Escolha um item e informe o peso em kg."); return; }
+  var quem = document.querySelector(".quem").value.trim(), obs = $("o-"+t).value.trim();
+  try {
+    for (var i = 0; i < rows.length; i++)
+      await db.collection("mov").add({t: t, item: rows[i].item, kg: rows[i].kg, ts: Date.now(), quem: quem, obs: obs});
+  } catch(err) { status("Não foi possível registrar (" + (err.code || "erro") + "). Confira se você tem permissão de escrita e tente de novo."); return; }
+  cart[t] = []; cartView(t); $("o-"+t).value = "";
+  status((t === "E" ? "Entrada" : "Retirada") + " registrada: " + rows.map(function(r){ return N(r.kg)+" kg de "+esc(r.item); }).join(", ") + ".", true);
+}
+
+function render(){
+  chips();
+  var s = stock(), nm = names();
+  $("tb").innerHTML = nm.map(function(n){
+    var o = s[n] || {e:0, s:0, at:0};
+    return '<tr><td>'+esc(n)+'</td><td class="'+(o.at < 0 ? 'neg' : '')+'"><b>'+N(o.at)+' kg</b></td><td>'+N(o.e)+'</td><td>'+N(o.s)+'</td></tr>';
+  }).join("");
+  var cur = $("ci").value;
+  $("ci").innerHTML = nm.map(function(n){ return '<option>'+esc(n)+'</option>'; }).join("");
+  if (cur) $("ci").value = cur;
+  $("rc").innerHTML = movs.slice().sort(function(a, b){ return b.ts - a.ts; }).slice(0, 20).map(function(m){
+    var d = new Date(m.ts).toLocaleString("pt-BR",{day:"2-digit",month:"2-digit",hour:"2-digit",minute:"2-digit"});
+    return '<tr><td>'+d+'</td><td>'+TIPO[m.t]+(m.obs ? ' ('+esc(m.obs)+')' : '')+'</td><td>'+esc(m.item)+'</td><td>'+(m.t === "S" ? "-" : m.kg > 0 ? "+" : "")+N(m.kg)+'</td><td>'+esc(m.quem || "-")+'</td><td>'+(canEdit ? '<button class="x" style="font-size:16px" data-del="'+m.id+'" aria-label="Apagar registro">Apagar</button>' : '')+'</td></tr>';
+  }).join("");
+}
+$("rc").addEventListener("click", async function(e){
+  var id = e.target.dataset.del; if (!id || !db) return;
+  if (!e.target.dataset.arm) { e.target.dataset.arm = 1; e.target.textContent = "Confirmar"; return; }
+  try { await db.collection("mov").doc(id).delete(); } catch(err) { status("Não foi possível apagar."); }
+});
+$("cb").onclick = async function(){
+  var kg = parseFloat($("ck").value), n = $("ci").value;
+  if (!db || isNaN(kg) || kg < 0) { status("Informe o peso contado em kg."); return; }
+  var at = (stock()[n] || {at: 0}).at, d = Math.round((kg - at) * 1000) / 1000;
+  try { await db.collection("mov").add({t: "A", item: n, kg: d, ts: Date.now(), quem: document.querySelector(".quem").value.trim(), obs: "contagem"}); }
+  catch(err) { status("Não foi possível registrar a contagem."); return; }
+  $("ck").value = "";
+  status(n + ": contado " + N(kg) + " kg, calculado " + N(at) + " kg (diferença de " + N(d) + " kg).", true);
+};
+
+function qr(){
+  var base = $("base").value.trim().split("#")[0];
+  $("qrs").innerHTML = "";
+  [["retirar","Retirar carnes","Cole no freezer"],["receber","Receber carnes","Cole no recebimento"]].forEach(function(q){
+    var d = document.createElement("div"); d.className = "qr";
+    d.innerHTML = '<b>'+q[1]+'</b><div class="c"></div><span>'+q[2]+'</span>';
+    $("qrs").appendChild(d);
+    try { new QRCode(d.querySelector(".c"), {text: base + "#" + q[0], width: 200, height: 200}); }
+    catch(e) { d.querySelector(".c").textContent = base + "#" + q[0]; }
+  });
+}
+function show(){
+  var v = location.hash.slice(1);
+  if (VS.indexOf(v) < 0 || (OWN.indexOf(v) > -1 && !canEdit)) v = "retirar";
+  VS.forEach(function(n){ $("v-"+n).hidden = n !== v; });
+  document.querySelectorAll(".tabs button").forEach(function(b){ b.setAttribute("aria-selected", b.dataset.v === v); });
+  if (v === "qr" && !$("qrs").children.length) qr();
+}
+document.querySelector(".tabs").addEventListener("click", function(e){ if (e.target.dataset.v) location.hash = e.target.dataset.v; });
+window.addEventListener("hashchange", show);
+$("base").value = "https://claude.ai/artifact/PP1E1mMcuFpE8gbBVAwgYy";
+$("base").addEventListener("change", qr);
+try { var q = localStorage.getItem("quem"); if (q) document.querySelectorAll(".quem").forEach(function(i){ i.value = q; }); } catch(e) {}
+var VS=['receber','retirar','estoque','qr'],OWN=['estoque','qr'];
+show(); cartView("E"); cartView("S");
+
+(async function(){
+  try { user = await claude.use("user"); canEdit = !!(user && user.canEdit()); } catch(e) {}
+  document.querySelectorAll("[data-own]").forEach(function(b){ b.hidden = !canEdit; });
+  show();
+  try { db = await claude.use("db"); } catch(e) {}
+  if (!db) { status("Sem conexão com o registro compartilhado. Abra o link logado na sua conta."); return; }
+  var to = setTimeout(function(){ status("O carregamento está demorando. Confira a conexão."); }, 10000);
+  db.collection("mov").onSnapshot(function(s){
+    clearTimeout(to);
+    movs = s.docs.map(function(d){ var x = Object.assign({}, d.data()); x.id = d.id; return x; });
+    render();
+  }, function(err){ clearTimeout(to); status("Sem acesso ao registro (" + err.code + ")."); });
+})();
+</script>
+</body>
+</html>
