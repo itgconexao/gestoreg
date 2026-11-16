@@ -40,7 +40,8 @@ export default async function PaginaQr() {
       <p className="mb-3 text-[13.5px] text-suave print:hidden">
         Os códigos apontam para este endereço: <b>{base}</b>. Gere e imprima
         esta página pelo endereço definitivo do site, não por um endereço de
-        teste. Quem ler o código precisa entrar com a própria conta.
+        teste. Quem ler o código não precisa de login: informa só o nome e
+        pode registrar entrada ou retirada e consultar o estoque.
       </p>
 
       <div className="grid grid-cols-[repeat(auto-fit,minmax(220px,1fr))] gap-3.5">

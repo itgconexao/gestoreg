@@ -1,12 +1,13 @@
+import Link from "next/link";
 import { sair } from "@/app/actions";
 import { Navegacao } from "@/components/navegacao";
-import { exigirPerfil } from "@/lib/auth";
+import { getPerfil } from "@/lib/auth";
 import { botaoSecundario } from "@/lib/estilos";
 
 export default async function LayoutApp({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
-  const perfil = await exigirPerfil();
+  const perfil = await getPerfil();
 
   return (
     <div className="mx-auto max-w-[760px] p-3.5">
@@ -14,17 +15,23 @@ export default async function LayoutApp({
         <h1 className="text-[21px] font-bold tracking-tight">
           Estoque de carnes
         </h1>
-        <div className="flex items-center gap-3">
-          <span className="text-[14px] text-suave">{perfil.nome}</span>
-          <form action={sair}>
-            <button type="submit" className={botaoSecundario}>
-              Sair
-            </button>
-          </form>
-        </div>
+        {perfil ? (
+          <div className="flex items-center gap-3">
+            <span className="text-[14px] text-suave">{perfil.nome}</span>
+            <form action={sair}>
+              <button type="submit" className={botaoSecundario}>
+                Sair
+              </button>
+            </form>
+          </div>
+        ) : (
+          <Link href="/login" className={botaoSecundario}>
+            Entrar
+          </Link>
+        )}
       </header>
 
-      <Navegacao admin={perfil.papel === "admin"} />
+      <Navegacao admin={perfil?.papel === "admin"} />
       {children}
     </div>
   );

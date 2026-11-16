@@ -7,7 +7,7 @@ import { cn } from "@/lib/utils";
 const ABAS = [
   { href: "/receber", rotulo: "Receber", admin: false },
   { href: "/retirar", rotulo: "Retirar", admin: false },
-  { href: "/estoque", rotulo: "Estoque", admin: true },
+  { href: "/estoque", rotulo: "Estoque", admin: false },
   { href: "/qr", rotulo: "QR codes", admin: true },
   { href: "/usuarios", rotulo: "Usuários", admin: true },
 ];

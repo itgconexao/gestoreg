@@ -42,10 +42,11 @@ export type Database = {
         Row: {
           corte_id: number
           criado_em: string
-          criado_por: string
+          criado_por: string | null
           destino: string | null
           fornecedor: string | null
           id: number
+          nome_responsavel: string | null
           observacao: string | null
           quantidade_kg: number
           tipo: Database["public"]["Enums"]["tipo_movimentacao"]
@@ -53,10 +54,11 @@ export type Database = {
         Insert: {
           corte_id: number
           criado_em?: string
-          criado_por?: string
+          criado_por?: string | null
           destino?: string | null
           fornecedor?: string | null
           id?: never
+          nome_responsavel?: string | null
           observacao?: string | null
           quantidade_kg: number
           tipo: Database["public"]["Enums"]["tipo_movimentacao"]
@@ -64,10 +66,11 @@ export type Database = {
         Update: {
           corte_id?: number
           criado_em?: string
-          criado_por?: string
+          criado_por?: string | null
           destino?: string | null
           fornecedor?: string | null
           id?: never
+          nome_responsavel?: string | null
           observacao?: string | null
           quantidade_kg?: number
           tipo?: Database["public"]["Enums"]["tipo_movimentacao"]
@@ -108,6 +111,13 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      cortes_publicos: {
+        Args: never
+        Returns: {
+          id: number
+          nome: string
+        }[]
+      }
       estoque_atual: {
         Args: never
         Returns: {
@@ -121,6 +131,15 @@ export type Database = {
       }
       registrar_contagem: {
         Args: { p_corte_id: number; p_kg: number }
+        Returns: number
+      }
+      registrar_movimento_publico: {
+        Args: {
+          p_detalhe: string
+          p_itens: Json
+          p_nome: string
+          p_tipo: Database["public"]["Enums"]["tipo_movimentacao"]
+        }
         Returns: number
       }
     }

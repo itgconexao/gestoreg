@@ -25,8 +25,9 @@ Gestão de estoque de carnes para estabelecimento: entrada, retirada, contagem f
 
 ## Telas
 
-- **Receber** e **Retirar**: qualquer usuário logado registra entradas e retiradas (os QR codes apontam para elas).
-- **Estoque**, **QR codes** e **Usuários**: somente administradores. No Estoque ficam o saldo, a contagem física, os cortes e o histórico.
+- **Receber**, **Retirar** e **Estoque** (saldo atual): abrem **sem login**, pelos QR codes. A pessoa informa só o nome, que fica gravado em cada registro.
+- **Estoque** para o administrador logado também mostra contagem física, novos cortes e o histórico (com exclusão).
+- **QR codes** e **Usuários**: somente administradores (login).
 
 ## Scripts
 

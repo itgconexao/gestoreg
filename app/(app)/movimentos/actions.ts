@@ -1,10 +1,8 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { exigirPerfil } from "@/lib/auth";
 import { lerKg } from "@/lib/kg";
 import { createClient } from "@/lib/supabase/server";
-import type { Database } from "@/types/database";
 
 export type EstadoForm = { n: number; ok?: string; erro?: string };
 
@@ -35,7 +33,10 @@ async function registrar(
   formData: FormData,
 ): Promise<EstadoForm> {
   const n = anterior.n;
-  await exigirPerfil();
+  const nome = String(formData.get("nome") ?? "").trim();
+  if (nome.length < 2 || nome.length > 60) {
+    return { n, erro: "Informe seu nome (entre 2 e 60 letras)." };
+  }
 
   const itens = lerItens(formData);
   if (typeof itens === "string") return { n, erro: itens };
@@ -49,17 +50,13 @@ async function registrar(
     .trim()
     .slice(0, 120);
 
-  const linhas: Database["public"]["Tables"]["movimentacoes"]["Insert"][] =
-    itens.map((item) => ({
-      tipo,
-      corte_id: item.corteId,
-      quantidade_kg: item.kg,
-      fornecedor: tipo === "entrada" ? campo || null : null,
-      destino: tipo === "saida" ? campo || null : null,
-    }));
-
   const supabase = await createClient();
-  const { error } = await supabase.from("movimentacoes").insert(linhas);
+  const { error } = await supabase.rpc("registrar_movimento_publico", {
+    p_tipo: tipo,
+    p_nome: nome,
+    p_detalhe: campo,
+    p_itens: itens.map((item) => ({ corte_id: item.corteId, kg: item.kg })),
+  });
   if (error) {
     return {
       n,

@@ -3,7 +3,8 @@ import { NextResponse, type NextRequest } from "next/server";
 import { env } from "@/lib/env";
 import type { Database } from "@/types/database";
 
-const ROTAS_PUBLICAS = ["/login"];
+// Receber, Retirar e Estoque abrem sem login (acesso pelos QR codes).
+const ROTAS_PUBLICAS = ["/login", "/receber", "/retirar", "/estoque"];
 
 function ehRotaPublica(caminho: string): boolean {
   return ROTAS_PUBLICAS.some(
@@ -13,7 +14,7 @@ function ehRotaPublica(caminho: string): boolean {
 
 /**
  * Renova a sessão do Supabase a cada requisição e redireciona:
- * - visitante sem login para /login (guardando a página de destino);
+ * - visitante sem login, em páginas que não são públicas, para /login (guardando o destino);
  * - usuário já logado que abre /login para a página inicial.
  */
 export async function atualizarSessao(request: NextRequest) {
