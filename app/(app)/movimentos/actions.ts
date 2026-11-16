@@ -38,6 +38,11 @@ async function registrar(
     return { n, erro: "Informe seu nome (entre 2 e 60 letras)." };
   }
 
+  const fornecedor = String(formData.get("fornecedor") ?? "").trim();
+  if (tipo === "entrada" && fornecedor.length < 2) {
+    return { n, erro: "Informe o fornecedor." };
+  }
+
   const itens = lerItens(formData);
   if (typeof itens === "string") return { n, erro: itens };
   if (itens.length === 0) {
@@ -87,4 +92,36 @@ export async function registrarSaida(
   formData: FormData,
 ): Promise<EstadoForm> {
   return registrar("saida", anterior, formData);
+}
+
+export async function criarCortePublico(
+  anterior: EstadoForm,
+  formData: FormData,
+): Promise<EstadoForm> {
+  const n = anterior.n;
+  const nome = String(formData.get("nome_corte") ?? "")
+    .trim()
+    .replace(/\s+/g, " ");
+  if (nome.length < 2 || nome.length > 60) {
+    return { n, erro: "Informe o nome do corte (entre 2 e 60 letras)." };
+  }
+
+  const supabase = await createClient();
+  const { error } = await supabase.rpc("criar_corte_publico", {
+    p_nome: nome,
+  });
+  if (error) {
+    return {
+      n,
+      erro:
+        error.code === "23505"
+          ? "Esse corte já existe."
+          : "Não foi possível adicionar o corte.",
+    };
+  }
+
+  revalidatePath("/receber");
+  revalidatePath("/retirar");
+  revalidatePath("/estoque");
+  return { n: n + 1, ok: `Corte "${nome}" adicionado. Já aparece na lista.` };
 }

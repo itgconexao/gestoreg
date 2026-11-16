@@ -111,6 +111,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      criar_corte_publico: {
+        Args: { p_nome: string }
+        Returns: number
+      }
       cortes_publicos: {
         Args: never
         Returns: {

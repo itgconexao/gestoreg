@@ -2,6 +2,7 @@
 
 import { useActionState, useEffect, useState } from "react";
 import {
+  criarCortePublico,
   registrarEntrada,
   registrarSaida,
   type EstadoForm,
@@ -78,6 +79,8 @@ export function FormMovimento({
             <input
               name="fornecedor"
               type="text"
+              required
+              minLength={2}
               maxLength={120}
               placeholder="Nome do fornecedor"
               className={campo}
@@ -126,6 +129,34 @@ export function FormMovimento({
           textoPendente="Registrando…"
           variante={modo === "entrada" ? "principal" : "saida"}
         />
+      </form>
+    </div>
+  );
+}
+
+export function FormNovoCortePublico() {
+  const [estado, acao] = useActionState<EstadoForm, FormData>(
+    criarCortePublico,
+    { n: 0 },
+  );
+
+  return (
+    <div>
+      <Mensagem ok={estado.ok} erro={estado.erro} />
+      <form key={estado.n} action={acao} className="flex flex-col gap-3">
+        <label className={rotuloCampo}>
+          Nome do novo corte
+          <input
+            name="nome_corte"
+            type="text"
+            required
+            minLength={2}
+            maxLength={60}
+            placeholder="Ex.: Picanha"
+            className={campo}
+          />
+        </label>
+        <BotaoEnviar texto="Adicionar corte" textoPendente="Adicionando…" />
       </form>
     </div>
   );
