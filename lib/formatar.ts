@@ -13,3 +13,15 @@ export function formatarDataHora(iso: string): string {
     minute: "2-digit",
   });
 }
+
+/** Data e hora completas no fuso de São Paulo, ex.: "30/11/2026 18:00". */
+export function formatarDataHoraCompleta(iso: string): string {
+  return new Date(iso).toLocaleString("pt-BR", {
+    timeZone: "America/Sao_Paulo",
+    day: "2-digit",
+    month: "2-digit",
+    year: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+  });
+}
