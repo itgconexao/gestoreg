@@ -38,6 +38,74 @@ export type Database = {
         }
         Relationships: []
       }
+      fechamento_itens: {
+        Row: {
+          abertura: number
+          ajustes: number
+          corte_id: number
+          entradas: number
+          fechamento_id: number
+          nome: string
+          saidas: number
+          saldo_final: number
+        }
+        Insert: {
+          abertura: number
+          ajustes: number
+          corte_id: number
+          entradas: number
+          fechamento_id: number
+          nome: string
+          saidas: number
+          saldo_final: number
+        }
+        Update: {
+          abertura?: number
+          ajustes?: number
+          corte_id?: number
+          entradas?: number
+          fechamento_id?: number
+          nome?: string
+          saidas?: number
+          saldo_final?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "fechamento_itens_fechamento_id_fkey"
+            columns: ["fechamento_id"]
+            isOneToOne: false
+            referencedRelation: "fechamentos"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      fechamentos: {
+        Row: {
+          fechado_em: string
+          fechado_por: string | null
+          fechado_por_nome: string
+          id: number
+          observacao: string | null
+          zerou: boolean
+        }
+        Insert: {
+          fechado_em: string
+          fechado_por?: string | null
+          fechado_por_nome: string
+          id?: never
+          observacao?: string | null
+          zerou?: boolean
+        }
+        Update: {
+          fechado_em?: string
+          fechado_por?: string | null
+          fechado_por_nome?: string
+          id?: never
+          observacao?: string | null
+          zerou?: boolean
+        }
+        Relationships: []
+      }
       movimentacoes: {
         Row: {
           corte_id: number
@@ -121,6 +189,10 @@ export type Database = {
           id: number
           nome: string
         }[]
+      }
+      fechar_estoque: {
+        Args: { p_observacao: string; p_zerar: boolean }
+        Returns: number
       }
       estoque_atual: {
         Args: never

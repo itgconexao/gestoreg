@@ -1,13 +1,19 @@
 import type { Metadata } from "next";
 import { BotaoApagar } from "@/components/botao-apagar";
+import { FormFechamento } from "@/components/form-fechamento";
 import { FormContagem, FormNovoCorte } from "@/components/forms-admin";
+import Link from "next/link";
 import { getPerfil } from "@/lib/auth";
 import {
   cabecalhoTabela,
   cartaoTabela,
   celulaTabela,
 } from "@/lib/estilos";
-import { formatarDataHora, formatarKg } from "@/lib/formatar";
+import {
+  formatarDataHora,
+  formatarDataHoraCompleta,
+  formatarKg,
+} from "@/lib/formatar";
 import { createClient } from "@/lib/supabase/server";
 import { cn } from "@/lib/utils";
 
@@ -25,7 +31,7 @@ export default async function PaginaEstoque() {
   const estoque = await supabase.rpc("estoque_atual");
 
   // Contagem, cortes e histórico são só do administrador.
-  const [movimentos, perfis, cortes] = admin
+  const [movimentos, perfis, cortes, fechamentos] = admin
     ? await Promise.all([
         supabase
           .from("movimentacoes")
@@ -36,8 +42,15 @@ export default async function PaginaEstoque() {
           .limit(30),
         supabase.from("perfis").select("id, nome"),
         supabase.from("cortes").select("id, nome").order("nome"),
+        supabase
+          .from("fechamentos")
+          .select("id, fechado_em, observacao, fechado_por_nome, zerou")
+          .order("fechado_em", { ascending: false }),
       ])
-    : [null, null, null];
+    : [null, null, null, null];
+
+  // Registros de períodos já fechados ficam travados (não podem ser apagados).
+  const ultimoFechamento = fechamentos?.data?.[0]?.fechado_em ?? null;
 
   const nomeCorte = new Map((cortes?.data ?? []).map((c) => [c.id, c.nome]));
   const nomeUsuario = new Map((perfis?.data ?? []).map((p) => [p.id, p.nome]));
@@ -97,6 +110,54 @@ export default async function PaginaEstoque() {
       </section>
 
       <section>
+        <h2 className="mb-1 text-base font-bold">Fechamento de estoque</h2>
+        <p className="mb-2 text-[13.5px] text-suave">
+          {ultimoFechamento
+            ? `Período atual: desde ${formatarDataHoraCompleta(ultimoFechamento)}.`
+            : "Período atual: desde o início do uso do sistema."}{" "}
+          Ao fechar, fica guardada uma cópia dos números do período.
+        </p>
+        <FormFechamento />
+
+        {(fechamentos?.data ?? []).length > 0 ? (
+          <div className={`${cartaoTabela} mt-3`}>
+            <table className="w-full min-w-[420px] border-collapse">
+              <thead>
+                <tr>
+                  <th className={cabecalhoTabela}>Fechamento</th>
+                  <th className={cabecalhoTabela}>Estoque</th>
+                  <th className={cabecalhoTabela}>
+                    <span className="sr-only">Abrir</span>
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                {(fechamentos?.data ?? []).map((f) => (
+                  <tr key={f.id}>
+                    <td className={celulaTabela}>
+                      #{f.id} · {formatarDataHoraCompleta(f.fechado_em)}
+                      {f.observacao ? ` · ${f.observacao}` : ""}
+                    </td>
+                    <td className={celulaTabela}>
+                      {f.zerou ? "Zerado" : "Mantido"}
+                    </td>
+                    <td className={celulaTabela}>
+                      <Link
+                        href={`/estoque/fechamentos/${f.id}`}
+                        className="text-[14px] font-semibold text-destaque"
+                      >
+                        Ver
+                      </Link>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        ) : null}
+      </section>
+
+      <section>
         <h2 className="mb-2 text-base font-bold">Últimos registros</h2>
         <div className={cartaoTabela}>
           <table className="w-full min-w-[520px] border-collapse">
@@ -143,7 +204,12 @@ export default async function PaginaEstoque() {
                         "-"}
                     </td>
                     <td className={celulaTabela}>
-                      <BotaoApagar id={mov.id} />
+                      {ultimoFechamento &&
+                      new Date(mov.criado_em) <= new Date(ultimoFechamento) ? (
+                        <span className="text-[13px] text-suave">Fechado</span>
+                      ) : (
+                        <BotaoApagar id={mov.id} />
+                      )}
                     </td>
                   </tr>
                 );

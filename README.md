@@ -27,6 +27,7 @@ Gestão de estoque de carnes para estabelecimento: entrada, retirada, contagem f
 
 - **Receber**, **Retirar** e **Estoque** (saldo atual): abrem **sem login**, pelos QR codes. A pessoa informa só o nome, que fica gravado em cada registro.
 - **Estoque** para o administrador logado também mostra contagem física, novos cortes e o histórico (com exclusão).
+- **Fechamento de estoque** (admin, na aba Estoque): guarda uma cópia dos números do período (abertura, entradas, saídas, ajustes, saldo final e consumo por corte). Ao fechar, escolhe-se manter a rodagem ou zerar o estoque. Há detalhe na tela e CSV para o Excel; registros de períodos fechados não podem mais ser apagados.
 - **QR codes** e **Usuários**: somente administradores (login).
 
 ## Scripts
