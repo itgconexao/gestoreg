@@ -190,6 +190,10 @@ export type Database = {
           nome: string
         }[]
       }
+      excluir_fechamento: {
+        Args: { p_id: number }
+        Returns: number
+      }
       fechar_estoque: {
         Args: { p_observacao: string; p_zerar: boolean }
         Returns: number

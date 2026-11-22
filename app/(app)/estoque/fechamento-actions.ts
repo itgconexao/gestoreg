@@ -38,3 +38,19 @@ export async function fecharEstoque(
   revalidatePath("/retirar");
   redirect(`/estoque/fechamentos/${data}`);
 }
+
+/** Exclui o fechamento mais recente e os registros do período dele (limpeza de testes). */
+export async function excluirFechamento(id: number, _formData: FormData) {
+  void _formData;
+  await exigirAdmin();
+
+  const supabase = await createClient();
+  const { error } = await supabase.rpc("excluir_fechamento", { p_id: id });
+  if (error) {
+    redirect(`/estoque/fechamentos/${id}?erro=excluir`);
+  }
+
+  revalidatePath("/estoque");
+  revalidatePath("/retirar");
+  redirect("/estoque");
+}

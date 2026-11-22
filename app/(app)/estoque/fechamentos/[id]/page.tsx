@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { BotaoExcluirFechamento } from "@/components/botao-excluir-fechamento";
+import { Mensagem } from "@/components/ui";
 import { exigirAdmin } from "@/lib/auth";
 import {
   botaoSecundario,
@@ -17,14 +19,19 @@ export const metadata: Metadata = {
 
 export default async function PaginaFechamento({
   params,
-}: Readonly<{ params: Promise<{ id: string }> }>) {
+  searchParams,
+}: Readonly<{
+  params: Promise<{ id: string }>;
+  searchParams: Promise<{ erro?: string }>;
+}>) {
   await exigirAdmin();
   const { id: idTexto } = await params;
+  const { erro } = await searchParams;
   const id = Number(idTexto);
   if (!Number.isInteger(id) || id <= 0) notFound();
 
   const supabase = await createClient();
-  const [fechamento, itens] = await Promise.all([
+  const [fechamento, itens, todos] = await Promise.all([
     supabase
       .from("fechamentos")
       .select("id, fechado_em, observacao, fechado_por_nome, zerou")
@@ -35,8 +42,29 @@ export default async function PaginaFechamento({
       .select("corte_id, nome, abertura, entradas, saidas, ajustes, saldo_final")
       .eq("fechamento_id", id)
       .order("nome"),
+    supabase
+      .from("fechamentos")
+      .select("id, fechado_em")
+      .order("fechado_em", { ascending: false }),
   ]);
   if (!fechamento.data) notFound();
+
+  // Só o fechamento mais recente pode ser excluído (do mais novo para o mais antigo).
+  const lista = todos.data ?? [];
+  const ehUltimo = lista[0]?.id === id;
+  const fechadoEm = new Date(fechamento.data.fechado_em);
+  const anterior = lista.find(
+    (f) => f.id !== id && new Date(f.fechado_em) < fechadoEm,
+  );
+  let registros = 0;
+  if (ehUltimo) {
+    let consulta = supabase
+      .from("movimentacoes")
+      .select("id", { count: "exact", head: true })
+      .lte("criado_em", fechamento.data.fechado_em);
+    if (anterior) consulta = consulta.gt("criado_em", anterior.fechado_em);
+    registros = (await consulta).count ?? 0;
+  }
 
   const linhas = (itens.data ?? []).map((item) => ({
     ...item,
@@ -111,6 +139,19 @@ export default async function PaginaFechamento({
         Consumo = abertura + entradas − saldo final (inclui diferenças da
         contagem). Valores em kg: o sistema ainda não registra preços.
       </p>
+
+      <section className="flex flex-col gap-2 print:hidden">
+        {erro === "excluir" ? (
+          <Mensagem erro="Não foi possível excluir. Só o fechamento mais recente pode ser excluído." />
+        ) : null}
+        {ehUltimo ? (
+          <BotaoExcluirFechamento id={fechamento.data.id} registros={registros} />
+        ) : (
+          <p className="text-[13px] text-suave">
+            Para excluir este fechamento, exclua antes os mais recentes.
+          </p>
+        )}
+      </section>
 
       <div className="flex gap-2 print:hidden">
         {/* eslint-disable-next-line @next/next/no-html-link-for-pages */}
